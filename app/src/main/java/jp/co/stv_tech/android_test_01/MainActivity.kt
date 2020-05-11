@@ -53,15 +53,26 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+
+    public override fun onStart() {
+        Log.i("MainActivity", "onStart")
+
+        val shopName = item["name"] as String
+        val shopId = item["SA11"] as String
+
+        val receiver = ShopInfoReceiver()
+        receiver.execute(shopId)
+        super.onStart()
+    }
     private fun createShopList():MutableList<MutableMap<String, Any>> {
         Log.i("MainActivity", "createShopList")
 
         val shopList: MutableList<MutableMap<String, Any>> = mutableListOf()
 
-        var shop = mutableMapOf<String, Any>("name" to "唐揚げ定食", "price" to 800,"desc" to "若鳥の唐揚げにサラダ、ご飯とお味噌汁が付きます。")
+        var shop = mutableMapOf<String, Any>("name" to "", "price" to 800,"desc" to "若鳥の唐揚げにサラダ、ご飯とお味噌汁が付きます。")
         shopList.add(shop)
 
-        shop = mutableMapOf<String, Any>("name" to "ハンバーグ定食", "price" to 800,"desc" to "手ごねハンバーグにサラダ、ご飯とお味噌汁が付きます。")
+        shop = mutableMapOf<String, Any>("name" to "", "price" to 800,"desc" to "手ごねハンバーグにサラダ、ご飯とお味噌汁が付きます。")
         shopList.add(shop)
 
         return shopList
@@ -145,7 +156,7 @@ class MainActivity : AppCompatActivity() {
             Log.i("MainActivity", "doInBackground")
 
             val id = params[0]
-            val urlStr = "https://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=sample&large_area=Z011"
+            val urlStr = "https://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=sample&large_area=Z011&format=json"
 
             val url = URL(urlStr)
             val con = url.openConnection() as HttpURLConnection
