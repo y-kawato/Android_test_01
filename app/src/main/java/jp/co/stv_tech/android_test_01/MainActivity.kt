@@ -24,6 +24,7 @@ import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -57,11 +58,13 @@ class MainActivity : AppCompatActivity() {
     public override fun onStart() {
         Log.i("MainActivity", "onStart")
 
-        val shopName = item["name"] as String
-        val shopId = item["SA11"] as String
+
+
+        //val shopName = item["name"] as String
+        //val shopId = item["X086"] as String
 
         val receiver = ShopInfoReceiver()
-        receiver.execute(shopId)
+        receiver.execute("X086")
         super.onStart()
     }
     private fun createShopList():MutableList<MutableMap<String, Any>> {
@@ -69,11 +72,7 @@ class MainActivity : AppCompatActivity() {
 
         val shopList: MutableList<MutableMap<String, Any>> = mutableListOf()
 
-        var shop = mutableMapOf<String, Any>("name" to "", "price" to 800,"desc" to "若鳥の唐揚げにサラダ、ご飯とお味噌汁が付きます。")
-        shopList.add(shop)
 
-        shop = mutableMapOf<String, Any>("name" to "", "price" to 800,"desc" to "手ごねハンバーグにサラダ、ご飯とお味噌汁が付きます。")
-        shopList.add(shop)
 
         return shopList
 
@@ -113,33 +112,29 @@ class MainActivity : AppCompatActivity() {
 
             return holder
         }
-        private inner class ListItemClickListener : AdapterView.OnItemClickListener {
-            override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                Log.i("MainActivity", "onItemClick")
-
-                val item = parent?.getItemAtPosition(position) as Map<String, String>
-                val shopName = item["name"]
-                val shopId = item["id"]
-
-                val tvShopName = findViewById<TextView>(R.id.tvgenreName)
-
-                val receiver = ShopInfoReceiver()
-                receiver.execute(shopId)
-            }
-        }
 
         override fun onBindViewHolder(holder: RecyclerListViewHolder, position: Int) {
             Log.i("MainActivity", "onBindViewHolder")
 
             val item = _listData[position]
-            val shopName = item["name"] as String
-            val shopPrice = item["price"] as Int
 
-            val shopPriceStr = shopPrice.toString()
+            val genre = item["name"] as String
+            val shopname = item["name"] as String
+            val l = item["l"] as String
+            val average = item["average"] as String
+            val open = item["open"] as String
+            val access = item["access"] as String
+            val address = item["address"] as String
 
-            holder.tvshopName.text = shopName
+            holder.tvgenreName.text = genre
+            holder.tvshopName.text = shopname
+            holder.tvshopName.text = shopname
+            holder.tvAverage.text = average
+            holder.tvOpen.text = open
+            holder.tvAccess.text = access
+            holder.tvAddress.text = address
 
-            holder.tvAverage.text = shopPriceStr
+
 
         }
         override fun getItemCount(): Int {
@@ -156,7 +151,7 @@ class MainActivity : AppCompatActivity() {
             Log.i("MainActivity", "doInBackground")
 
             val id = params[0]
-            val urlStr = "https://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=sample&large_area=Z011&format=json"
+            val urlStr = "https://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=a0393a19b3f6514e&small_area=${id}&format=json"
 
             val url = URL(urlStr)
             val con = url.openConnection() as HttpURLConnection
@@ -174,32 +169,30 @@ class MainActivity : AppCompatActivity() {
             Log.i("MainActivity", "onPostExecute")
 
             val rootJSON = JSONObject(result)
-            val shopJSON = rootJSON.getJSONObject("shop")
-            val genre = shopJSON.getJSONObject("genre")
+            val resultsJSON = rootJSON.getJSONObject("results")
+            val shopJSON = resultsJSON.getJSONArray("shop")
+            val shopObject = shopJSON.getJSONObject(0)
+
+            val genre = shopObject.getJSONObject("genre")
             val genrename = genre.getString("name")
 
-            val subgenre = shopJSON.getJSONObject("subgenre")
-            val subgenrename = subgenre.getString("name")
-
-            val photo = shopJSON.getJSONObject("photo")
+            val photo = shopObject.getJSONObject("photo")
             val mobile = photo.getJSONObject("mobile")
-            val i = mobile.getString("i")
+            val l = mobile.getString("l")
 
-            val food = shopJSON.getJSONObject("food")
-            val foodname = food.getString("name")
+            //val food = shopObject.getJSONObject("food")
+            //val foodname = food.getString("name")
 
-            val shop = rootJSON.getJSONArray("shop")
-            val shopNow = shop.getJSONObject(0)
-            val shopname = shopNow.getString("name")
+            val shopname = shopObject.getString("name")
 
-            val budget = shopJSON.getJSONObject("budget")
+            val budget = shopObject.getJSONObject("budget")
             val average = budget.getString("average")
 
-            val open = shopJSON.getString("open")
+            val open = shopObject.getString("open")
 
-            val access = shopJSON.getString("access")
+            val access = shopObject.getString("access")
 
-            val address = shopJSON.getString("address")
+            val address = shopObject.getString("address")
 
 
 
