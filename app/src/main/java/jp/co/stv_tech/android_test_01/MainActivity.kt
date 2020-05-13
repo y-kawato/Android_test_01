@@ -15,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.TextView
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStream
@@ -23,6 +24,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 class MainActivity : AppCompatActivity() {
+    val shopList: MutableList<MutableMap<String, String>> = mutableListOf()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,10 +69,14 @@ class MainActivity : AppCompatActivity() {
         receiver.execute("X086")
         super.onStart()
     }
-    private fun createShopList():MutableList<MutableMap<String, Any>> {
+    private fun createShopList():MutableList<MutableMap<String,String>> {
         Log.i("MainActivity", "createShopList")
 
-        val shopList: MutableList<MutableMap<String, Any>> = mutableListOf()
+
+        var shop = mutableMapOf("genrename" to "", "shopname" to "", "foodname" to "",
+        "average" to "", "open" to "", "access" to "", "address" to "")
+
+        shopList.add(shop)
 
 
 
@@ -98,7 +104,7 @@ class MainActivity : AppCompatActivity() {
             tvAddress = itemView.findViewById(R.id.tvAddress)
         }
     }
-    private inner class RecyclerListAdapter(private val _listData: MutableList<MutableMap<String, Any>>):
+    private inner class RecyclerListAdapter(private val _listData: MutableList<MutableMap<String, String>>):
         RecyclerView.Adapter<RecyclerListViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerListViewHolder {
             Log.i("MainActivity", "onCreateViewHolder")
@@ -118,7 +124,7 @@ class MainActivity : AppCompatActivity() {
 
             val item = _listData[position]
 
-            val genre = item["name"] as String
+            val genrename = item["name"] as String
             val shopname = item["name"] as String
             val l = item["l"] as String
             val average = item["average"] as String
@@ -126,9 +132,9 @@ class MainActivity : AppCompatActivity() {
             val access = item["access"] as String
             val address = item["address"] as String
 
-            holder.tvgenreName.text = genre
+            holder.tvgenreName.text = genrename
             holder.tvshopName.text = shopname
-            holder.tvshopName.text = shopname
+            //holder.tvFood.text = foodname
             holder.tvAverage.text = average
             holder.tvOpen.text = open
             holder.tvAccess.text = access
@@ -193,8 +199,6 @@ class MainActivity : AppCompatActivity() {
             val access = shopObject.getString("access")
 
             val address = shopObject.getString("address")
-
-
 
         }
         private fun is2String(stream: InputStream): String {
