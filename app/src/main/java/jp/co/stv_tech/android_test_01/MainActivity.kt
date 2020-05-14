@@ -67,18 +67,12 @@ class MainActivity : AppCompatActivity() {
 
         val receiver = ShopInfoReceiver()
         receiver.execute("X086")
+
+
         super.onStart()
     }
     private fun createShopList():MutableList<MutableMap<String,String>> {
         Log.i("MainActivity", "createShopList")
-
-
-        var shop = mutableMapOf("genrename" to "", "shopname" to "", "foodname" to "",
-        "average" to "", "open" to "", "access" to "", "address" to "")
-
-        shopList.add(shop)
-
-
 
         return shopList
 
@@ -123,10 +117,10 @@ class MainActivity : AppCompatActivity() {
             Log.i("MainActivity", "onBindViewHolder")
 
             val item = _listData[position]
-
-            val genrename = item["name"] as String
-            val shopname = item["name"] as String
-            val l = item["l"] as String
+            Log.i("MainActivity", "${position}")
+            val genrename = item["genrename"] as String
+            val shopname = item["shopname"] as String
+            //val l = item["l"] as String
             val average = item["average"] as String
             val open = item["open"] as String
             val access = item["access"] as String
@@ -139,7 +133,6 @@ class MainActivity : AppCompatActivity() {
             holder.tvOpen.text = open
             holder.tvAccess.text = access
             holder.tvAddress.text = address
-
 
 
         }
@@ -158,7 +151,7 @@ class MainActivity : AppCompatActivity() {
 
             val id = params[0]
             val urlStr = "https://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=a0393a19b3f6514e&small_area=${id}&format=json"
-
+            Log.i("MainActivity", "urlStr:"+urlStr)
             val url = URL(urlStr)
             val con = url.openConnection() as HttpURLConnection
             con.requestMethod = "GET"
@@ -177,28 +170,48 @@ class MainActivity : AppCompatActivity() {
             val rootJSON = JSONObject(result)
             val resultsJSON = rootJSON.getJSONObject("results")
             val shopJSON = resultsJSON.getJSONArray("shop")
-            val shopObject = shopJSON.getJSONObject(0)
 
-            val genre = shopObject.getJSONObject("genre")
-            val genrename = genre.getString("name")
 
-            val photo = shopObject.getJSONObject("photo")
-            val mobile = photo.getJSONObject("mobile")
-            val l = mobile.getString("l")
 
-            //val food = shopObject.getJSONObject("food")
-            //val foodname = food.getString("name")
 
-            val shopname = shopObject.getString("name")
+            val shopnumber = resultsJSON.getString("results_returned")
+            Log.i("MainActivity", "shopnumber:"+shopnumber)
 
-            val budget = shopObject.getJSONObject("budget")
-            val average = budget.getString("average")
+            var number:Int = shopnumber.toInt()
 
-            val open = shopObject.getString("open")
+            for (i in 0..number-1) {
+                val shopObject = shopJSON.getJSONObject(i)
+                Log.i("MainActivity", "${i}")
 
-            val access = shopObject.getString("access")
+                val genre = shopObject.getJSONObject("genre")
+                val genrename = genre.getString("name")
+                Log.i("MainActivity", "genrename:"+genrename)
+                val photo = shopObject.getJSONObject("photo")
+                val mobile = photo.getJSONObject("mobile")
+                val l = mobile.getString("l")
 
-            val address = shopObject.getString("address")
+                //val food = shopObject.getJSONObject("food")
+                //val foodname = food.getString("name")
+
+                val shopname = shopObject.getString("name")
+
+                val budget = shopObject.getJSONObject("budget")
+                val average = budget.getString("average")
+
+                val open = shopObject.getString("open")
+
+                val access = shopObject.getString("access")
+
+                val address = shopObject.getString("address")
+
+                var shop = mutableMapOf("genrename" to genrename, "shopname" to shopname,
+                    "average" to average, "open" to open, "access" to access, "address" to address)
+
+                shopList.add(shop)
+
+            }
+
+
 
         }
         private fun is2String(stream: InputStream): String {
